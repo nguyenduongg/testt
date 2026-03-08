@@ -22,6 +22,25 @@
             -webkit-user-select: none; user-select: none;
         }
 
+        /* --- MINI MUSIC PLAYER (GÓC TRÊN PHẢI) --- */
+        #mini-player {
+            position: fixed; top: 20px; right: 20px;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+            padding: 10px 15px; border-radius: 50px;
+            display: none; align-items: center; gap: 10px;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.2);
+            z-index: 1000; border: 2px solid var(--accent);
+        }
+        .player-btn {
+            background: var(--accent); color: white; border: none;
+            width: 30px; height: 30px; border-radius: 50%;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            font-size: 12px; transition: 0.3s;
+        }
+        .vol-slider {
+            width: 60px; accent-color: var(--accent); cursor: pointer;
+        }
+
         /* --- UI CHỌN NHẠC --- */
         .glass-card {
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
@@ -147,6 +166,11 @@
 
     <audio id="bgMusic" loop></audio>
 
+    <div id="mini-player">
+        <button class="player-btn" onclick="togglePlayMusic()" id="playPauseBtn">II</button>
+        <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="1" oninput="changeVolume(this.value)">
+    </div>
+
     <div id="music-intro">
         <img id="vinyl-disc" src="">
         <img id="pixel-player" src="pixel_player.png">
@@ -217,7 +241,7 @@
             <img src="anh1.jpg" class="slideshow-img active">
             <img src="anh2.jpg" class="slideshow-img">
             <img src="anh3.jpg" class="slideshow-img">
-            
+            <img src="anh4.jpg" class="slideshow-img">
         </div>
         <div class="content">
             <h1 id="outName" style="font-family: 'Dancing Script'; font-size: 3rem; margin: 0; color: var(--accent); font-weight: 900;"></h1>
@@ -232,6 +256,7 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const audio = document.getElementById('bgMusic');
         let userName = "", score = 0, gameActive = false, moveL = false, moveR = false;
         let lives = 3, selectedMusic = "", currentSlide = 0;
         
@@ -245,7 +270,6 @@
         let player = { x: 90, y: 130, h: 75, w: 60, currentPic: 0, facingLeft: false };
         let hearts = [];
 
-        // HỨNG SỰ KIỆN BÀN PHÍM CHO MÁY TÍNH
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moveL = true;
             if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moveR = true;
@@ -265,7 +289,6 @@
 
         function startIntro(music, thumb) {
             selectedMusic = music;
-            const audio = document.getElementById('bgMusic'); 
             audio.src = music; 
             audio.load();
 
@@ -295,6 +318,22 @@
             }, 4500);
         }
 
+        /* LOGIC PLAYER NHẠC MINI */
+        function togglePlayMusic() {
+            const btn = document.getElementById('playPauseBtn');
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "II";
+            } else {
+                audio.pause();
+                btn.innerText = "▶";
+            }
+        }
+
+        function changeVolume(val) {
+            audio.volume = val;
+        }
+
         function showRules() {
             document.getElementById('game-rules').style.display = 'flex';
             const ruleMsg = "Xin chào và chúc bạn một ngày tốt lành!\nSau đây là hướng dẫn chơi:\n Dùng phím mũi tên trên màn hình để di chuyển\n Nhặt đủ 8 trái tim để qua màn\n Cẩn thận trái tim màu đen nhé, chạm và là tèo đó\n Good luck ❤️";
@@ -305,7 +344,7 @@
 
         function reallyStartGame() {
             document.getElementById('game-rules').style.display = 'none';
-            document.getElementById('bgMusic').play().catch(e => {});
+            audio.play().catch(e => {});
             document.getElementById('game-box').style.display = 'flex';
             restartGame();
         }
@@ -353,11 +392,8 @@
         function update() {
             if(!gameActive) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // XỬ LÝ DI CHUYỂN
             if(moveL && player.x > 0) { player.x -= 4.5; player.facingLeft = true; }
             if(moveR && player.x < canvas.width - player.w) { player.x += 4.5; player.facingLeft = false; }
-            
             if (score < 2) player.currentPic = 0; else if (score < 4) player.currentPic = 1; else if (score < 6) player.currentPic = 2; else player.currentPic = 3;
             drawPlayer();
             if(Math.random() < 0.02) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'pink', speed: 2.3 });
@@ -384,6 +420,8 @@
         function goToDashboard() {
             document.getElementById('congrat-screen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'flex';
+            // HIỆN MINI PLAYER KHI VÀO DASHBOARD
+            document.getElementById('mini-player').style.display = 'flex';
             document.getElementById('outName').innerText = `Thân gửi ${userName},`;
             const wishText = "Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️";
             typeWriter(wishText, "outWish", 65);
