@@ -27,33 +27,42 @@
         @keyframes spin-mini { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* --- MINI PLAYER STYLE --- */
+        /* --- MINI PLAYER (DƯỚI GÓC PHẢI) --- */
         #mini-player {
-            position: fixed; top: 15px; right: 15px; background: #fff; padding: 12px;
-            border-radius: 10px; display: none; flex-direction: column; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 1000; border: 2px solid #333; width: 130px;
+            background: #fff; padding: 10px; border-radius: 12px;
+            display: none; flex-direction: column; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #333; width: 120px;
         }
-        .player-disc-wrapper { width: 70px; height: 70px; margin-bottom: 8px; }
+        .player-disc-wrapper { width: 60px; height: 60px; margin-bottom: 5px; }
         #mini-thumb { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #333; }
         .rotating { animation: spin-mini 4s linear infinite !important; }
         .track-name-container { width: 100%; overflow: hidden; white-space: nowrap; margin-bottom: 5px; }
         .track-name { display: inline-block; font-family: 'VT323', monospace; font-size: 14px; animation: marquee 8s linear infinite; }
-        .progress-container { width: 100%; height: 3px; background: #eee; margin-bottom: 8px; position: relative; }
+        .progress-bar-wrap { width: 100%; height: 3px; background: #eee; border-radius: 2px; position: relative; }
         #progressCurrent { height: 100%; background: var(--accent); width: 0%; position: absolute; }
-        .progress-dot { width: 6px; height: 6px; background: #333; border-radius: 50%; position: absolute; right: -3px; top: -1.5px; }
-        #miniPlayBtn { border: 2px solid #333; width: 26px; height: 26px; border-radius: 50%; background: none; cursor: pointer; }
+        #miniPlayBtn { border: 2px solid #333; width: 24px; height: 24px; border-radius: 50%; background: none; cursor: pointer; font-size: 10px; margin-top: 5px; }
 
-        /* --- LỊCH TRÊN DASHBOARD --- */
-        .calendar-card {
-            background: white; padding: 15px; border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(255, 77, 109, 0.1);
-            width: fit-content; text-align: center;
+        /* --- UI DASHBOARD --- */
+        .dashboard { display: none; width: 95%; max-width: 600px; flex-direction: column; align-items: center; padding: 10px 0; }
+        .main-card { position: relative; aspect-ratio: 16/9; width: 100%; border-radius: 25px; overflow: hidden; background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .slideshow-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 1.5s; }
+        .slideshow-img.active { opacity: 1; }
+
+        .bottom-ui {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            width: 100%; padding: 0 5px; margin-top: 15px; box-sizing: border-box;
         }
-        .cal-month { color: var(--accent); font-weight: bold; font-size: 14px; margin-bottom: 10px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; font-size: 10px; color: #444; }
-        .cal-day-special { background: var(--accent); color: white; border-radius: 5px; font-weight: bold; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
 
-        /* --- UI COMPONENTS --- */
+        .calendar-card {
+            background: white; padding: 10px; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.1);
+            width: 120px; text-align: center; border: 1px solid #eee;
+        }
+        .cal-month { color: var(--accent); font-weight: bold; font-size: 12px; margin-bottom: 5px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; font-size: 9px; color: #444; }
+        .cal-day-special { background: var(--accent); color: white; border-radius: 4px; font-weight: bold; }
+
+        /* --- CÁC THÀNH PHẦN GAME --- */
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); padding: 30px; border-radius: 30px; text-align: center; box-shadow: 0 10px 30px rgba(255, 77, 125, 0.2); width: 90%; max-width: 400px; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; }
         .music-list { list-style: none; padding: 0; margin: 20px 0; max-height: 250px; overflow-y: auto; text-align: left; }
         .music-item { display: flex; align-items: center; gap: 12px; background: white; padding: 8px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; }
@@ -73,27 +82,12 @@
         #canvas { background: var(--screen-bg); width: 250px; height: 200px; border: 3px solid #000; }
         #game-over-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: none; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 10; }
 
-        .dashboard { display: none; width: 95%; max-width: 600px; flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; }
-        .main-card { position: relative; aspect-ratio: 16/9; width: 100%; border-radius: 25px; overflow: hidden; background: #000; }
-        .slideshow-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 1.5s; }
-        .slideshow-img.active { opacity: 1; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <audio id="bgMusic" loop></audio>
-
-    <div id="mini-player">
-        <div class="player-disc-wrapper"><img id="mini-thumb" src="" class="rotating"></div>
-        <div class="track-name-container"><div class="track-name" id="track-title">Loading...</div></div>
-        <div class="progress-container"><div id="progressCurrent"><div class="progress-dot"></div></div></div>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <span style="font-size:12px;">|◀</span>
-            <button id="miniPlayBtn" onclick="togglePlayMusic()">II</button>
-            <span style="font-size:12px;">▶|</span>
-        </div>
-    </div>
 
     <div id="step-1" class="glass-card">
         <h2 style="color: var(--accent); font-family: 'Press Start 2P'; font-size: 12px;">HELLO MY BAE</h2>
@@ -139,8 +133,8 @@
             </div>
         </div>
         <div style="display:flex; gap:25px;">
-            <button class="btn-move" style="width:80px; height:80px; border-radius:50%; background:#333; color:white; font-size:30px; border:none;" onmousedown="move(true,'L')" onmouseup="move(false,'L')" ontouchstart="move(true,'L',event)" ontouchend="move(false,'L',event)">◀</button>
-            <button class="btn-move" style="width:80px; height:80px; border-radius:50%; background:#333; color:white; font-size:30px; border:none;" onmousedown="move(true,'R')" onmouseup="move(false,'R')" ontouchstart="move(true,'R',event)" ontouchend="move(false,'R',event)">▶</button>
+            <button class="btn-move" style="width:80px; height:80px; border-radius:50%; background:#333; color:white; border:none;" onmousedown="move(true,'L')" onmouseup="move(false,'L')" ontouchstart="move(true,'L',event)" ontouchend="move(false,'L',event)">◀</button>
+            <button class="btn-move" style="width:80px; height:80px; border-radius:50%; background:#333; color:white; border:none;" onmousedown="move(true,'R')" onmouseup="move(false,'R')" ontouchstart="move(true,'R',event)" ontouchend="move(false,'R',event)">▶</button>
         </div>
     </div>
 
@@ -153,13 +147,22 @@
         <div class="main-card">
             <img src="anh1.jpg" class="slideshow-img active"><img src="anh2.jpg" class="slideshow-img"><img src="anh3.jpg" class="slideshow-img"><img src="anh4.jpg" class="slideshow-img">
         </div>
-        <div class="content">
-            <h1 id="outName" style="font-family:'Dancing Script'; font-size:3rem; color:var(--accent); margin:0;"></h1>
-            <p id="outWish" class="typing" style="font-family:'Dancing Script'; font-size:1.6rem; color:#444; margin-top:10px; font-weight:700;"></p>
+        <div class="content" style="text-align: center;">
+            <h1 id="outName" style="font-family:'Dancing Script'; font-size:2.8rem; color:var(--accent); margin:10px 0 0 0;"></h1>
+            <p id="outWish" class="typing" style="font-family:'Dancing Script'; font-size:1.5rem; color:#444; margin:5px 0; font-weight:700;"></p>
         </div>
-        <div class="calendar-card">
-            <div class="cal-month">MARCH 2026</div>
-            <div class="cal-grid" id="cal-grid"></div>
+
+        <div class="bottom-ui">
+            <div class="calendar-card">
+                <div class="cal-month">MARCH 2026</div>
+                <div class="cal-grid" id="cal-grid"></div>
+            </div>
+            <div id="mini-player">
+                <div class="player-disc-wrapper"><img id="mini-thumb" src="" class="rotating"></div>
+                <div class="track-name-container"><div class="track-name" id="track-title">Loading...</div></div>
+                <div class="progress-bar-wrap"><div id="progressCurrent"></div></div>
+                <button id="miniPlayBtn" onclick="togglePlayMusic()">II</button>
+            </div>
         </div>
     </div>
 
@@ -169,21 +172,18 @@
         const audio = document.getElementById('bgMusic');
         let userName = "", score = 0, gameActive = false, moveL = false, moveR = false, lives = 3, hearts = [], currentSlide = 0;
 
-        // LOAD HÌNH NHÂN VẬT & TỰ TÍNH TỈ LỆ
         const pics = [];
-        let player = { x: 90, y: 125, h: 100, w: 55, currentPic: 0, facingLeft: false };
+        let player = { x: 90, y: 125, h: 70, w: 55, currentPic: 0, facingLeft: false };
 
         for(let i=1; i<=4; i++) {
             const img = new Image();
             img.src = `pic${i}.png`;
             img.onload = function() {
-                // Tự động tính w dựa trên h=70 và tỉ lệ ảnh thực [image_8f2bc6.png]
                 if(i === 1) player.w = player.h * (img.width / img.height);
             }
             pics.push(img);
         }
 
-        // SỰ KIỆN PHÍM PC
         window.addEventListener('keydown', (e) => {
             if(e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') moveL = true;
             if(e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') moveR = true;
@@ -204,37 +204,23 @@
             const items = document.querySelectorAll('.music-item');
             let fullTitle = "";
             items.forEach(it => { if(it.getAttribute('onclick').includes(music)) fullTitle = it.querySelector('span').innerText; });
-
             audio.src = music;
             document.getElementById('mini-thumb').src = thumb;
             document.getElementById('track-title').innerText = fullTitle;
-            
             document.getElementById('step-2').classList.add('hidden');
             const introLayer = document.getElementById('music-intro');
             const vinyl = document.getElementById('vinyl-disc');
             introLayer.style.display = 'flex';
             vinyl.src = thumb;
             document.getElementById('pixel-player').style.opacity = '1';
-
             setTimeout(() => vinyl.classList.add('in-center'), 100);
-            setTimeout(() => {
-                vinyl.classList.add('intro-spinning');
-                audio.play();
-                document.getElementById('mini-thumb').classList.add('rotating');
-            }, 1400);
-            setTimeout(() => {
-                vinyl.classList.add('fly-out-combined');
-                document.getElementById('pixel-player').classList.add('fly-out-combined');
-            }, 3500);
-            setTimeout(() => {
-                introLayer.style.display = 'none';
-                showRules();
-            }, 4500);
+            setTimeout(() => { vinyl.classList.add('intro-spinning'); audio.play(); document.getElementById('mini-thumb').classList.add('rotating'); }, 1400);
+            setTimeout(() => { vinyl.classList.add('fly-out-combined'); document.getElementById('pixel-player').classList.add('fly-out-combined'); }, 3500);
+            setTimeout(() => { introLayer.style.display = 'none'; showRules(); }, 4500);
         }
 
         function showRules() {
             document.getElementById('game-rules').style.display = 'flex';
-            // GIỮ NGUYÊN VĂN BẢN
             const msg = "Xin chào và chúc bạn một ngày tốt lành!\nSau đây là hướng dẫn chơi:\n Dùng phím mũi tên trên màn hình để di chuyển\n Nhặt đủ 8 trái tim để qua màn\n Cẩn thận trái tim màu đen nhé, chạm và là tèo đó\n Good luck ❤️";
             typeWriter(msg, "rule-text", 40, () => document.getElementById('start-btn').style.display = 'block');
         }
@@ -274,7 +260,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if(moveL && player.x > 0) { player.x -= 4.5; player.facingLeft = true; }
             if(moveR && player.x < canvas.width - player.w) { player.x += 4.5; player.facingLeft = false; }
-            
             player.currentPic = score < 2 ? 0 : score < 4 ? 1 : score < 6 ? 2 : 3;
             const img = pics[player.currentPic];
             if(img && img.complete) {
@@ -283,10 +268,8 @@
                 else { ctx.drawImage(img, player.x, player.y, player.w, player.h); }
                 ctx.restore();
             }
-
             if(Math.random() < 0.02) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'pink', speed: 2.3 });
             if(Math.random() < 0.01) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'black', speed: 1.5 });
-
             hearts.forEach((h, i) => {
                 h.y += h.speed;
                 drawHeart(h.x, h.y, h.s, h.type === 'pink' ? '#ff4d6d' : '#333');
@@ -303,9 +286,8 @@
 
         function togglePlayMusic() {
             const btn = document.getElementById('miniPlayBtn');
-            const thumb = document.getElementById('mini-thumb');
-            if (audio.paused) { audio.play(); btn.innerText = "II"; thumb.classList.add('rotating'); }
-            else { audio.pause(); btn.innerText = "▶"; thumb.classList.remove('rotating'); }
+            if (audio.paused) { audio.play(); btn.innerText = "II"; document.getElementById('mini-thumb').classList.add('rotating'); }
+            else { audio.pause(); btn.innerText = "▶"; document.getElementById('mini-thumb').classList.remove('rotating'); }
         }
 
         audio.addEventListener('timeupdate', () => {
@@ -318,7 +300,6 @@
             document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('mini-player').style.display = 'flex';
             document.getElementById('outName').innerText = `Thân gửi ${userName},`;
-            // GIỮ NGUYÊN VĂN BẢN LỜI CHÚC
             typeWriter("Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️", "outWish", 60);
             generateCalendar();
             startSlideshow();
@@ -343,7 +324,12 @@
 
         function startSlideshow() {
             const slides = document.querySelectorAll('.slideshow-img');
-            setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000);
+            if(slides.length === 0) return;
+            setInterval(() => { 
+                slides[currentSlide].classList.remove('active'); 
+                currentSlide = (currentSlide + 1) % slides.length; 
+                slides[currentSlide].classList.add('active'); 
+            }, 4000);
         }
     </script>
 </body>
