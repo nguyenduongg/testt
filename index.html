@@ -12,7 +12,6 @@
             --screen-bg: #fff0f3; 
             --accent: #ff4d6d;
             --btn-dark: #333;
-            --glass: rgba(255, 255, 255, 0.9);
         }
 
         body {
@@ -23,18 +22,18 @@
             -webkit-user-select: none; user-select: none;
         }
 
-        /* --- SPOTIFY STYLE MINI PLAYER --- */
+        /* --- SPOTIFY STYLE PLAYER (GÓC TRÊN PHẢI) --- */
         #mini-player {
             position: fixed; top: 15px; right: 15px;
-            background: var(--glass); backdrop-filter: blur(15px);
-            padding: 8px 12px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
+            padding: 10px; border-radius: 15px;
             display: none; align-items: center; gap: 12px;
             box-shadow: 0 8px 32px rgba(255, 77, 109, 0.15);
-            z-index: 1000; border: 1px solid rgba(255,255,255,0.4);
+            z-index: 1000; border: 1px solid var(--accent);
             width: 220px;
         }
         .player-thumb-wrapper {
-            position: relative; width: 45px; height: 45px;
+            position: relative; width: 45px; height: 45px; flex-shrink: 0;
         }
         #mini-thumb {
             width: 100%; height: 100%; border-radius: 50%;
@@ -44,19 +43,19 @@
         .track-name { 
             font-size: 11px; font-weight: 600; color: var(--accent);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 4px;
         }
-        .player-controls { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+        .player-controls { display: flex; align-items: center; gap: 10px; }
         .play-btn-mini {
             background: var(--accent); color: white; border: none;
-            width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+            width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center; font-size: 10px;
         }
-        .vol-wrapper { display: flex; align-items: center; gap: 5px; }
-        .vol-slider { width: 50px; accent-color: var(--accent); cursor: pointer; height: 3px; }
+        .vol-slider { width: 60px; accent-color: var(--accent); cursor: pointer; height: 4px; }
         
-        /* Animation xoay đĩa mini */
+        /* Hiệu ứng xoay đĩa mini */
         .rotating { animation: spin 3s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin { from { transform:translate(-50%,-50%) rotate(0deg); } to { transform:translate(-50%,-50%) rotate(360deg); } }
 
         /* --- UI CHỌN NHẠC --- */
         .glass-card {
@@ -71,39 +70,104 @@
         .music-item {
             display: flex; align-items: center; gap: 15px; background: white;
             padding: 10px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; border: 1px solid #ffeef1;
-            transition: 0.2s;
         }
-        .music-item:hover { background: #fff0f3; transform: scale(1.02); }
         .thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--console); }
 
-        /* --- INTRO & GAME OVER (GIỮ NGUYÊN) --- */
-        #music-intro { position: fixed; inset: 0; background: var(--pink-bg); display: none; justify-content: center; align-items: center; z-index: 150; }
-        #pixel-player { width: 220px; image-rendering: pixelated; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0; z-index: 160; transition: opacity 0.5s ease; }
-        #vinyl-disc { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 6px solid #111; position: absolute; left: -200px; top: 50%; transform: translateY(-50%); opacity: 0; z-index: 200; transition: left 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; }
-        .intro-spinning { animation: spin 2s linear infinite; }
-        #vinyl-disc.in-center { left: 50%; transform: translate(-50%, -50%); opacity: 1; }
+        /* --- INTRO MÁY & ĐĨA --- */
+        #music-intro {
+            position: fixed; inset: 0; background: var(--pink-bg);
+            display: none; justify-content: center; align-items: center; z-index: 150;
+        }
+        #pixel-player { 
+            width: 220px; image-rendering: pixelated; position: absolute; 
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            opacity: 0; z-index: 160; 
+            transition: opacity 0.5s ease;
+        }
+        #vinyl-disc {
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover; 
+            border: 6px solid #111; position: absolute; 
+            left: -200px; top: 50%;
+            transform: translateY(-50%); opacity: 0; 
+            z-index: 200; 
+            transition: left 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+        }
+        .spinning { animation: spin 2s linear infinite; }
+        #vinyl-disc.in-center { left: 50%;top:50%; transform: translate(-50%, -50%); opacity: 1; }
         .fly-out-combined { left: 150% !important; opacity: 0 !important; transition: left 1s ease-in, opacity 0.8s ease !important; }
 
-        #game-rules { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 300; }
-        .paper-container { width: 350px; height: 450px; background: url('paper.png') no-repeat center; background-size: contain; display: flex; flex-direction: column; align-items: center; padding: 85px 50px 100px 50px; text-align: center; box-sizing: border-box; }
-        #rule-text { font-family: 'VT323', monospace; font-size: 18px; color: #5a3e2b; line-height: 1.3; font-weight: normal; text-align: justify; white-space: pre-line; word-break: break-word; width: 100%; margin: 0; }
+        /* --- TỜ GIẤY LUẬT CHƠI --- */
+        #game-rules {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 300;
+        }
+        .paper-container {
+            width: 350px; height: 450px; background: url('paper.png') no-repeat center;
+            background-size: contain; display: flex; flex-direction: column; align-items: center;
+            padding: 85px 50px 100px 50px; text-align: center; box-sizing: border-box;
+        }
+        #rule-text {
+            font-family: 'VT323', monospace; font-size: 18px; color: #5a3e2b; 
+            line-height: 1.3; font-weight: normal; text-align: justify; white-space: pre-line; 
+            word-break: break-word; width: 100%; margin: 0;
+        }
 
-        #congrat-screen { position: fixed; inset: 0; background: var(--pink-bg); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 400; text-align: center; }
-        .congrat-title { font-family: 'VT323', monospace; font-size: 3.5rem; color: var(--accent); animation: bounce 1s infinite alternate; margin-bottom: 20px; }
+        /* --- MÀN HÌNH CHÚC MỪNG --- */
+        #congrat-screen {
+            position: fixed; inset: 0; background: var(--pink-bg);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 400; text-align: center;
+        }
+        .congrat-title {
+            font-family: 'VT323', monospace; font-size: 3.5rem; color: var(--accent);
+            animation: bounce 1s infinite alternate; margin-bottom: 20px;
+        }
         @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-        #game-box { display: none; width: 350px; height: 620px; background: var(--console); border-radius: 20px 20px 60px 20px; box-shadow: inset -5px -5px 0px rgba(0,0,0,0.2), 10px 20px 40px rgba(0,0,0,0.1); flex-direction: column; align-items: center; padding: 25px; z-index: 100; position: relative; }
-        .screen-frame { width: 290px; height: 250px; background: #222; border-radius: 10px; display: flex; justify-content: center; align-items: center; margin-bottom: 30px; position: relative; overflow: hidden; }
+        /* --- MÁY CHƠI GAME --- */
+        #game-box {
+            display: none; width: 350px; height: 620px;
+            background: var(--console); border-radius: 20px 20px 60px 20px;
+            box-shadow: inset -5px -5px 0px rgba(0,0,0,0.2), 10px 20px 40px rgba(0,0,0,0.1);
+            flex-direction: column; align-items: center; padding: 25px; z-index: 100;
+            position: relative;
+        }
+        .screen-frame {
+            width: 290px; height: 250px; background: #222; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 30px;
+            position: relative; overflow: hidden;
+        }
         #canvas { background: var(--screen-bg); width: 250px; height: 210px; border: 3px solid #000; }
-        #game-over-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 210; color: white; }
+        #game-over-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 210; color: white;
+        }
 
         .big-controls { width: 100%; display: flex; justify-content: space-around; }
-        .btn-move { width: 85px; height: 85px; background: var(--btn-dark); border: none; border-radius: 50%; color: white; font-size: 2rem; cursor: pointer; box-shadow: 0 6px 0 #000; transition: 0.1s; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .btn-move {
+            width: 85px; height: 85px; background: var(--btn-dark); border: none;
+            border-radius: 50%; color: white; font-size: 2rem; cursor: pointer;
+            box-shadow: 0 6px 0 #000; transition: 0.1s;
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
         .btn-move:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
 
-        .dashboard { display: none; width: 95%; max-width: 600px; flex-direction: column; align-items: center; gap: 20px; padding: 20px 0; }
-        .main-card { position: relative; aspect-ratio: 16/9; width: 100%; border-radius: 25px; overflow: hidden; background: #000; box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
-        .slideshow-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out; }
+        /* --- DASHBOARD --- */
+        .dashboard { 
+            display: none; width: 95%; max-width: 600px; 
+            flex-direction: column; align-items: center; gap: 20px; padding: 20px 0;
+        }
+        .main-card { 
+            position: relative; aspect-ratio: 16/9; width: 100%; 
+            border-radius: 25px; overflow: hidden; background: #000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .slideshow-img {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out;
+        }
         .slideshow-img.active { opacity: 1; }
         .content { width: 100%; text-align: center; padding: 10px 20px; }
         .typing::after { content: '|'; animation: blink 0.7s infinite; }
@@ -122,13 +186,10 @@
             <img id="mini-thumb" src="" class="rotating">
         </div>
         <div class="player-info">
-            <div class="track-name" id="track-title">Đang phát...</div>
+            <div id="mini-track-title" class="track-name">Đang phát...</div>
             <div class="player-controls">
                 <button class="play-btn-mini" onclick="togglePlayMusic()" id="miniPlayBtn">II</button>
-                <div class="vol-wrapper">
-                    <span style="font-size: 10px;">Vol</span>
-                    <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="1" oninput="changeVolume(this.value)">
-                </div>
+                <input type="range" class="vol-slider" min="0" max="1" step="0.1" value="1" oninput="changeVolume(this.value)">
             </div>
         </div>
     </div>
@@ -140,7 +201,7 @@
 
     <div id="congrat-screen">
         <div class="congrat-title">CONGRATULATIONS!</div>
-        <p style="font-family: 'VT323', monospace; font-size: 1.5rem; color: #555;">Thử thách đã xong, quà đang chờ nàng!</p>
+        <p style="font-family: 'VT323', monospace; font-size: 1.5rem; color: #555;">Bạn đã hoàn thành thử thách tuyệt vời!</p>
         <button style="margin-top: 30px; background: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);" onclick="goToDashboard()">MỞ QUÀ NGAY 🎁</button>
     </div>
 
@@ -162,20 +223,20 @@
     <div id="step-2" class="glass-card hidden">
         <h2 style="color: var(--accent)">CHỌN NHẠC 🎵</h2>
         <div class="music-list">
-            <div class="music-item" onclick="startIntro('music1.mp3', 'thumb1.jpg', 'Phonecert - Hoàng Dũng')">
-                <img src="thumb1.jpg" class="thumb"> <span>Phonecert - Hoàng Dũng</span>
+            <div class="music-item" onclick="startIntro('music1.mp3', 'thumb1.jpg', 'Phonecert - Hoàng Dũng x 10cm')">
+                <img src="thumb1.jpg" class="thumb"> <span>Phonecert - Hoàng Dũng x 10cm</span>
             </div>
-            <div class="music-item" onclick="startIntro('music2.mp3', 'thumb2.jpg', 'In Love - Justatee')">
-                <img src="thumb2.jpg" class="thumb"> <span>In Love - Justatee</span>
+            <div class="music-item" onclick="startIntro('music2.mp3', 'thumb2.jpg', 'In Love - LowG x Justatee')">
+                <img src="thumb2.jpg" class="thumb"> <span>In Love - LowG x Justatee</span>
             </div>
             <div class="music-item" onclick="startIntro('music3.mp3', 'thumb3.jpg', 'Ôm trọn thương yêu - RUM')">
                 <img src="thumb3.jpg" class="thumb"> <span>Ôm trọn thương yêu - RUM</span>
             </div>
-            <div class="music-item" onclick="startIntro('music4.mp3', 'thumb4.jpg', 'Giữ anh cho ngày hôm qua')">
-                <img src="thumb4.jpg" class="thumb"> <span>Giữ anh cho ngày hôm qua</span>
+            <div class="music-item" onclick="startIntro('music4.mp3', 'thumb4.jpg', 'Giữ anh cho ngày hôm qua - Hoàng Dũng')">
+                <img src="thumb4.jpg" class="thumb"> <span>Giữ anh cho ngày hôm qua - Hoàng Dũng</span>
             </div>
-            <div class="music-item" onclick="startIntro('music5.mp3', 'thumb5.jpg', 'Từng ngày yêu em')">
-                <img src="thumb5.jpg" class="thumb"> <span>Từng ngày yêu em</span>
+            <div class="music-item" onclick="startIntro('music5.mp3', 'thumb5.jpg', 'Từng ngày yêu em - buitruonglinh')">
+                <img src="thumb5.jpg" class="thumb"> <span>Từng ngày yêu em - buitruonglinh</span>
             </div>
         </div>
     </div>
@@ -208,6 +269,10 @@
         <div class="content">
             <h1 id="outName" style="font-family: 'Dancing Script'; font-size: 3rem; margin: 0; color: var(--accent); font-weight: 900;"></h1>
             <p id="outWish" class="typing" style="font-family: 'Dancing Script'; font-size: 1.7rem; color: #444; margin-top: 10px; font-weight: 700;"></p>
+        </div>
+        <div class="glass-card" style="width: auto; padding: 15px; position: relative; transform: none; left: auto; top: auto;">
+            <h3 style="color: var(--accent); margin: 0; font-size: 14px;">MARCH 2026</h3>
+            <div id="cal" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; font-size: 10px; margin-top: 5px;"></div>
         </div>
     </div>
 
@@ -245,13 +310,13 @@
             document.getElementById('step-2').classList.remove('hidden');
         }
 
-        function startIntro(music, thumb, title) {
+        function startIntro(music, thumb, trackTitle) {
             audio.src = music; 
             audio.load();
-            
-            // Cập nhật thông tin cho mini player
+
+            // Gán dữ liệu cho Mini Player
             document.getElementById('mini-thumb').src = thumb;
-            document.getElementById('track-title').innerText = title;
+            document.getElementById('mini-track-title').innerText = trackTitle;
 
             document.getElementById('step-2').classList.add('hidden');
             const introLayer = document.getElementById('music-intro');
@@ -264,9 +329,8 @@
 
             setTimeout(() => { vinyl.classList.add('in-center'); }, 100);
             setTimeout(() => {
-                vinyl.classList.add('intro-spinning');
+                vinyl.classList.add('spinning');
                 audio.play();
-                // Bắt đầu hiệu ứng xoay ở mini thumb
                 document.getElementById('mini-thumb').classList.add('rotating');
             }, 1400);
             setTimeout(() => {
@@ -275,7 +339,7 @@
             }, 3500);
             setTimeout(() => {
                 introLayer.style.display = 'none';
-                vinyl.classList.remove('in-center', 'intro-spinning', 'fly-out-combined');
+                vinyl.classList.remove('in-center', 'spinning', 'fly-out-combined');
                 playerImg.classList.remove('fly-out-combined');
                 showRules();
             }, 4500);
@@ -299,7 +363,7 @@
 
         function showRules() {
             document.getElementById('game-rules').style.display = 'flex';
-            const ruleMsg = "Hứng đủ 8 tim hồng để thắng nhé.\nNé tim đen ra nha, trúng 3 phát là tèo đó.\nChúc công chúa may mắn! ❤️";
+            const ruleMsg = "Xin chào và chúc bạn một ngày tốt lành!\nSau đây là hướng dẫn chơi:\n Dùng phím mũi tên trên màn hình để di chuyển\n Nhặt đủ 8 trái tim để qua màn\n Cẩn thận trái tim màu đen nhé, chạm và là tèo đó\n Good luck ❤️";
             typeWriter(ruleMsg, "rule-text", 45, () => {
                 document.getElementById('start-btn').style.display = 'block';
             });
@@ -307,7 +371,7 @@
 
         function reallyStartGame() {
             document.getElementById('game-rules').style.display = 'none';
-            audio.play();
+            audio.play().catch(e => {});
             document.getElementById('game-box').style.display = 'flex';
             restartGame();
         }
@@ -401,6 +465,13 @@
             const slides = document.querySelectorAll('.slideshow-img');
             if(slides.length <= 1) return;
             setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000);
+        }
+
+        const cal = document.getElementById('cal');
+        for(let i=1; i<=31; i++) {
+            let d = document.createElement('div'); d.innerText = i;
+            if(i===8) { d.style.background = "var(--accent)"; d.style.color="white"; d.style.borderRadius="3px"; d.style.fontWeight="bold"; }
+            cal.appendChild(d);
         }
     </script>
 </body>
