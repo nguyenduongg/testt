@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>8/3 Special Gift for Princess</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Press+Start+2P&family=VT323&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-bg: #ffeef2;
+            --console: #ff85a2;
+            --screen-bg: #fff0f3; 
+            --accent: #ff4d6d;
+            --btn-dark: #333;
+        }
+
+        body {
+            margin: 0; padding: 0; background: var(--pink-bg);
+            font-family: 'Poppins', sans-serif; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden; touch-action: manipulation;
+            -webkit-user-select: none; user-select: none;
+        }
+
+        /* --- UI CHỌN NHẠC --- */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px);
+            padding: 30px; border-radius: 30px; text-align: center;
+            box-shadow: 0 10px 30px rgba(255, 77, 125, 0.2); 
+            width: 90%; max-width: 400px;
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%); z-index: 100;
+        }
+        .music-list { list-style: none; padding: 0; margin: 20px 0; max-height: 280px; overflow-y: auto; text-align: left; }
+        .music-item {
+            display: flex; align-items: center; gap: 15px; background: white;
+            padding: 10px; border-radius: 15px; margin-bottom: 10px; cursor: pointer; border: 1px solid #ffeef1;
+        }
+        .thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--console); }
+
+        /* --- INTRO MÁY & ĐĨA --- */
+        #music-intro {
+            position: fixed; inset: 0; background: var(--pink-bg);
+            display: none; justify-content: center; align-items: center; z-index: 150;
+        }
+        #pixel-player { 
+            width: 220px; image-rendering: pixelated; position: absolute; 
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            opacity: 0; z-index: 160; 
+            transition: left 1.2s ease-in, opacity 1s ease;
+        }
+        #vinyl-disc {
+            width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 8px solid #111;
+            position: absolute; left: -200px; top: 50%;
+            transform: translateY(-50%) rotate(0deg); opacity: 0; 
+            z-index: 200; 
+            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #vinyl-disc.in-center { left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(360deg); opacity: 1; }
+        .fly-out-combined { left: 150% !important; opacity: 0 !important; transition: left 1.2s ease-in, opacity 0.8s ease !important; }
+
+        /* --- TỜ GIẤY LUẬT CHƠI --- */
+        #game-rules {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 300;
+        }
+        .paper-container {
+            width: 350px; height: 450px; background: url('paper.png') no-repeat center;
+            background-size: contain; display: flex; flex-direction: column; align-items: center;
+            padding: 85px 50px 100px 50px; text-align: center; box-sizing: border-box;
+        }
+        #rule-text {
+            font-family: 'VT323', monospace; font-size: 18px; color: #5a3e2b; 
+            line-height: 1.3; font-weight: normal; text-align: justify; white-space: pre-line; 
+            word-break: break-word; width: 100%; margin: 0;
+        }
+
+        /* --- MÀN HÌNH CHÚC MỪNG (CONGRATULATION) --- */
+        #congrat-screen {
+            position: fixed; inset: 0; background: var(--pink-bg);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 400; text-align: center;
+        }
+        .congrat-title {
+            font-family: 'VT323', monospace; font-size: 3.5rem; color: var(--accent);
+            animation: bounce 1s infinite alternate; margin-bottom: 20px;
+        }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        /* --- MÁY CHƠI GAME & GAME OVER --- */
+        #game-box {
+            display: none; width: 350px; height: 620px;
+            background: var(--console); border-radius: 20px 20px 60px 20px;
+            box-shadow: inset -5px -5px 0px rgba(0,0,0,0.2), 10px 20px 40px rgba(0,0,0,0.1);
+            flex-direction: column; align-items: center; padding: 25px; z-index: 100;
+            position: relative;
+        }
+        .screen-frame {
+            width: 290px; height: 250px; background: #222; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 30px;
+            position: relative; overflow: hidden;
+        }
+        #canvas { background: var(--screen-bg); width: 250px; height: 210px; border: 3px solid #000; }
+        #game-over-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 210; color: white;
+        }
+
+        .big-controls { width: 100%; display: flex; justify-content: space-around; }
+        .btn-move {
+            width: 85px; height: 85px; background: var(--btn-dark); border: none;
+            border-radius: 50%; color: white; font-size: 2rem; cursor: pointer;
+            box-shadow: 0 6px 0 #000; transition: 0.1s;
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-move:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
+
+        /* --- DASHBOARD HẬU GAME --- */
+        .dashboard { 
+            display: none; width: 95%; max-width: 600px; 
+            flex-direction: column; align-items: center; gap: 20px; padding: 20px 0;
+        }
+        .main-card { 
+            position: relative; aspect-ratio: 16/9; width: 100%; 
+            border-radius: 25px; overflow: hidden; background: #000;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .slideshow-img {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in-out;
+        }
+        .slideshow-img.active { opacity: 1; }
+        .content { width: 100%; text-align: center; padding: 10px 20px; }
+        .typing::after { content: '|'; animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .hidden { display: none !important; }
+        input { padding: 12px; border-radius: 12px; border: 2px solid #ffcbd5; width: 80%; margin-bottom: 20px; outline: none; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop></audio>
+
+    <div id="music-intro">
+        <img id="vinyl-disc" src="">
+        <img id="pixel-player" src="pixel_player.png">
+    </div>
+
+    <div id="congrat-screen">
+        <div class="congrat-title">CONGRATULATIONS!</div>
+        <p style="font-family: 'VT323', monospace; font-size: 1.5rem; color: #555;">Bạn đã hoàn thành thử thách tuyệt vời!</p>
+        <button style="margin-top: 30px; background: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);" onclick="goToDashboard()">MỞ QUÀ NGAY 🎁</button>
+    </div>
+
+    <div id="game-rules">
+        <div class="paper-container">
+            <h2 style="font-family: 'VT323', monospace; font-weight: 700; font-size: 20px; color: #5a3e2b; margin-bottom: 5px;">LUẬT CHƠI</h2>
+            <p id="rule-text"></p>
+            <button id="start-btn" style="display:none; background:#5a3e2b; color:white; padding:10px 25px; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-top: auto; margin-bottom: 15px;" onclick="reallyStartGame()">BẮT ĐẦU</button>
+        </div>
+    </div>
+
+    <div id="step-1" class="glass-card">
+        <h2 style="color: var(--accent); font-family: 'Press Start 2P'; font-size: 12px;">HELLO MY BAE</h2>
+        <input type="text" id="nameInput" placeholder="Nhập tên của bạn">
+        <br>
+        <button style="background:var(--accent); color:white; padding:12px 25px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="toStep2()">TIẾP TỤC</button>
+    </div>
+
+    <div id="step-2" class="glass-card hidden">
+        <h2 style="color: var(--accent)">CHỌN NHẠC 🎵</h2>
+        <div class="music-list">
+            <div class="music-item" onclick="startIntro('music1.mp3', 'thumb1.jpg')">
+                <img src="thumb1.jpg" class="thumb"> <span>Phonecert - Hoàng Dũng x 10cm</span>
+            </div>
+            <div class="music-item" onclick="startIntro('music2.mp3', 'thumb2.jpg')">
+                <img src="thumb2.jpg" class="thumb"> <span>In Love - LowG x Justatee</span>
+            </div>
+            <div class="music-item" onclick="startIntro('music3.mp3', 'thumb3.jpg')">
+                <img src="thumb3.jpg" class="thumb"> <span>Ôm trọn thương yêu - RUM</span>
+            </div>
+            <div class="music-item" onclick="startIntro('music4.mp3', 'thumb4.jpg')">
+                <img src="thumb4.jpg" class="thumb"> <span>Giữ anh cho ngày hôm qua - Hoàng Dũng</span>
+            </div>
+            <div class="music-item" onclick="startIntro('music5.mp3', 'thumb5.jpg')">
+                <img src="thumb5.jpg" class="thumb"> <span>Từng ngày yêu em - buitruonglinh</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-box">
+        <div style="width:100%; display:flex; justify-content:space-between; font-family:'Press Start 2P'; font-size:8px; color:#fff; margin-bottom:12px;">
+            <span>SCORE: <span id="score">0</span>/8 ❤️</span>
+            <span>LIVES: <span id="lives">❤️❤️❤️</span></span>
+        </div>
+        <div class="screen-frame">
+            <canvas id="canvas"></canvas>
+            <div id="game-over-overlay">
+                <h3 style="font-family: 'Press Start 2P'; font-size: 14px; color: var(--accent);">GAME OVER</h3>
+                <button style="margin-top: 15px; background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;" onclick="restartGame()">THỬ LẠI</button>
+            </div>
+        </div>
+        <div class="big-controls">
+            <button class="btn-move" onmousedown="move(true, 'L')" onmouseup="move(false, 'L')" ontouchstart="move(true, 'L', event)" ontouchend="move(false, 'L', event)">◀</button>
+            <button class="btn-move" onmousedown="move(true, 'R')" onmouseup="move(false, 'R')" ontouchstart="move(true, 'R', event)" ontouchend="move(false, 'R', event)">▶</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="main-card">
+            <img src="anh1.jpg" class="slideshow-img active">
+            <img src="anh2.jpg" class="slideshow-img">
+            <img src="anh3.jpg" class="slideshow-img">
+            <img src="anh4.jpg" class="slideshow-img">
+        </div>
+        <div class="content">
+            <h1 id="outName" style="font-family: 'Dancing Script'; font-size: 3rem; margin: 0; color: var(--accent); font-weight: 900;"></h1>
+            <p id="outWish" class="typing" style="font-family: 'Dancing Script'; font-size: 1.7rem; color: #444; margin-top: 10px; font-weight: 700;"></p>
+        </div>
+        <div class="glass-card" style="width: auto; padding: 15px; position: relative; transform: none; left: auto; top: auto;">
+            <h3 style="color: var(--accent); margin: 0; font-size: 14px;">MARCH 2026</h3>
+            <div id="cal" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; font-size: 10px; margin-top: 5px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let userName = "", score = 0, gameActive = false, moveL = false, moveR = false;
+        let lives = 3, selectedMusic = "", currentSlide = 0;
+        
+        const pics = [];
+        for(let i=1; i<=4; i++) {
+            const img = new Image();
+            img.src = `pic${i}.png`;
+            pics.push(img);
+        }
+
+        let player = { x: 90, y: 130, h: 75, w: 60, currentPic: 0, facingLeft: false };
+        let hearts = [];
+
+        function toStep2() {
+            userName = document.getElementById('nameInput').value.trim();
+            if(!userName) return alert("Vui lòng nhập tên!");
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+        }
+
+        function startIntro(music, thumb) {
+            selectedMusic = music;
+            const audio = document.getElementById('bgMusic'); audio.src = music; audio.load();
+            document.getElementById('step-2').classList.add('hidden');
+            const intro = document.getElementById('music-intro');
+            const vinyl = document.getElementById('vinyl-disc');
+            const pPlayer = document.getElementById('pixel-player');
+            intro.style.display = 'flex';
+            vinyl.src = thumb; pPlayer.style.opacity = '1';
+            setTimeout(() => vinyl.classList.add('in-center'), 100);
+            setTimeout(() => {
+                vinyl.classList.add('fly-out-combined'); pPlayer.classList.add('fly-out-combined');
+            }, 2000);
+            setTimeout(() => {
+                intro.style.display = 'none';
+                vinyl.classList.remove('in-center', 'fly-out-combined');
+                pPlayer.classList.remove('fly-out-combined');
+                showRules();
+            }, 3200);
+        }
+
+        function showRules() {
+            document.getElementById('game-rules').style.display = 'flex';
+            const ruleMsg = "Xin chào và chúc bạn một ngày tốt lành!\nSau đây là hướng dẫn chơi:\n Dùng phím mũi tên trên màn hình để di chuyển\n Nhặt đủ 8 trái tim để qua màn\n Cẩn thận trái tim màu đen nhé, chạm và là tèo đó\n Good luck ❤️";
+            typeWriter(ruleMsg, "rule-text", 45, () => {
+                document.getElementById('start-btn').style.display = 'block';
+            });
+        }
+
+        function reallyStartGame() {
+            document.getElementById('game-rules').style.display = 'none';
+            document.getElementById('bgMusic').play().catch(e => console.log(e));
+            document.getElementById('game-box').style.display = 'flex';
+            restartGame();
+        }
+
+        function restartGame() {
+            score = 0; lives = 3; hearts = [];
+            player.x = 90;
+            document.getElementById('score').innerText = "0";
+            document.getElementById('lives').innerText = "❤️❤️❤️";
+            document.getElementById('game-over-overlay').style.display = 'none';
+            gameActive = true;
+            canvas.width = 250; canvas.height = 210;
+            update();
+        }
+
+        function move(isMoving, dir, event) {
+            if (event && event.cancelable) event.preventDefault();
+            if(dir === 'L') moveL = isMoving;
+            if(dir === 'R') moveR = isMoving;
+        }
+
+        function drawHeart(x, y, s, color) {
+            ctx.fillStyle = color; ctx.beginPath();
+            ctx.moveTo(x, y+s/4); ctx.quadraticCurveTo(x,y,x+s/4,y);
+            ctx.quadraticCurveTo(x+s/2,y,x+s/2,y+s/4); ctx.quadraticCurveTo(x+s/2,y,x+s*3/4,y);
+            ctx.quadraticCurveTo(x+s,y,x+s,y+s/4); ctx.quadraticCurveTo(x+s,y+s/2,x+s/2,y+s*3/4);
+            ctx.quadraticCurveTo(x,y+s/2,x,y+s/4); ctx.fill();
+        }
+
+        function drawPlayer() {
+            const currentImg = pics[player.currentPic];
+            if (currentImg.complete && currentImg.width > 0) {
+                player.w = player.h * (currentImg.width / currentImg.height);
+                ctx.save();
+                if (player.facingLeft) {
+                    ctx.translate(player.x + player.w, player.y); ctx.scale(-1, 1);
+                    ctx.drawImage(currentImg, 0, 0, currentImg.width, currentImg.height, 0, 0, player.w, player.h);
+                } else {
+                    ctx.drawImage(currentImg, 0, 0, currentImg.width, currentImg.height, player.x, player.y, player.w, player.h);
+                }
+                ctx.restore();
+            }
+        }
+
+        function update() {
+            if(!gameActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(moveL && player.x > 0) { player.x -= 4.5; player.facingLeft = true; }
+            if(moveR && player.x < canvas.width - player.w) { player.x += 4.5; player.facingLeft = false; }
+            if (score < 2) player.currentPic = 0; else if (score < 4) player.currentPic = 1; else if (score < 6) player.currentPic = 2; else player.currentPic = 3;
+            drawPlayer();
+            if(Math.random() < 0.02) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'pink', speed: 2.3 });
+            if(Math.random() < 0.01) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'black', speed: 1.4 });
+            hearts.forEach((h, i) => {
+                h.y += h.speed;
+                drawHeart(h.x, h.y, h.s, h.type === 'pink' ? '#ff4d6d' : '#333');
+                if(h.y > player.y && h.y < player.y + 30 && h.x > player.x - 5 && h.x < player.x + player.w + 5) {
+                    if(h.type === 'pink') { score++; document.getElementById('score').innerText = score; }
+                    else { lives--; document.getElementById('lives').innerText = "❤️".repeat(lives); if(lives <= 0) { gameActive = false; document.getElementById('game-over-overlay').style.display = 'flex'; } }
+                    hearts.splice(i, 1);
+                    if(score >= 8) { gameActive = false; showCongrat(); } // CHUYỂN ĐẾN MÀN HÌNH CONGRAT
+                }
+                if(h.y > 210) hearts.splice(i, 1);
+            });
+            if(gameActive) requestAnimationFrame(update);
+        }
+
+        function showCongrat() {
+            document.getElementById('game-box').style.display = 'none';
+            document.getElementById('congrat-screen').style.display = 'flex';
+        }
+
+        function goToDashboard() {
+            document.getElementById('congrat-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+            document.getElementById('outName').innerText = `Thân gửi ${userName},`;
+            const wishText = "Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️";
+            typeWriter(wishText, "outWish", 65);
+            startSlideshow();
+        }
+
+        function typeWriter(text, elementId, speed, callback) {
+            let i = 0; const elem = document.getElementById(elementId);
+            elem.innerHTML = "";
+            function type() { if (i < text.length) { if (text.charAt(i) === '\n') elem.innerHTML += "<br>"; else elem.innerHTML += text.charAt(i); i++; setTimeout(type, speed); } else if(callback) callback(); }
+            type();
+        }
+
+        function startSlideshow() {
+            const slides = document.querySelectorAll('.slideshow-img');
+            if(slides.length <= 1) return;
+            setInterval(() => { slides[currentSlide].classList.remove('active'); currentSlide = (currentSlide + 1) % slides.length; slides[currentSlide].classList.add('active'); }, 4000);
+        }
+
+        const cal = document.getElementById('cal');
+        for(let i=1; i<=31; i++) {
+            let d = document.createElement('div'); d.innerText = i;
+            if(i===8) { d.style.background = "var(--accent)"; d.style.color="white"; d.style.borderRadius="3px"; d.style.fontWeight="bold"; }
+            cal.appendChild(d);
+        }
+    </script>
+</body>
+</html>
