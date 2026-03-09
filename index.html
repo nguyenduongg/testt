@@ -144,9 +144,8 @@
     </div>
 
     <div id="dashboard" class="dashboard">
-        <div class="main-card">
-            <img src="anh1.jpg" class="slideshow-img active"><img src="anh2.jpg" class="slideshow-img"><img src="anh3.jpg" class="slideshow-img"><img src="anh4.jpg" class="slideshow-img">
-        </div>
+        <div class="main-card" id="slideshow-container">
+            </div>
         <div class="content" style="text-align: center;">
             <h1 id="outName" style="font-family:'Dancing Script'; font-size:2.8rem; color:var(--accent); margin:10px 0 0 0;"></h1>
             <p id="outWish" class="typing" style="font-family:'Dancing Script'; font-size:1.5rem; color:#444; margin:5px 0; font-weight:700;"></p>
@@ -171,6 +170,28 @@
         const ctx = canvas.getContext('2d');
         const audio = document.getElementById('bgMusic');
         let userName = "", score = 0, gameActive = false, moveL = false, moveR = false, lives = 3, hearts = [], currentSlide = 0;
+
+        // --- HỆ THỐNG DỮ LIỆU CÁ NHÂN HÓA GIẢ ---
+        const personalData = {
+            "linhanh": { ten: "Linh Anh", wish: "", anhs: ["https://i.postimg.cc/VLpzNy5d/486646074-2435518356802131-3691249354360137055-n.jpg", "https://i.postimg.cc/xdRrMBjs/629657398-2348208208996779-5238679348793359584-n.jpg", ""] },
+            "tuyetanh": { ten: "Tuyết Anh", wish: "", anhs: ["https://i.postimg.cc/c1zpRRWT/602347210-1377948470485508-2069237118809059709-n.jpg", "", ""] },
+            "ngocanh": { ten: "Ngọc Ánh", wish: "", anhs: ["https://i.postimg.cc/1zy2mM0F/625825570-1409887734007057-4865105951450292214-n.jpg", "https://i.postimg.cc/Px0k5YrM/628737189-1409887664007064-8968991863882993926-n.jpg", ""] },
+            "tragiang": { ten: "Trà Giang", wish: "", anhs: ["https://i.postimg.cc/3wW60N6W/8d1feda8-7f53-4c86-a912-4f581e5a74ac.jpg", "https://i.postimg.cc/k4bpwZqY/533defc7-0506-4f7a-9744-2315d5a8c382.jpg", "https://i.postimg.cc/BZ2zKdhJ/ed3dca94-900d-4e40-a490-619da3a9992e.jpg"] },
+            "minhhanh": { ten: "Minh Hạnh", wish: "", anhs: ["https://i.postimg.cc/RVRbPwxJ/Clip-Down-com-472237686-18121030678415690-2217473660469641138-n.jpg", "https://i.postimg.cc/XY11W3vD/Clip-Down-com-610695968-18157802689415690-2461280711945907490-n.jpg", "https://i.postimg.cc/pTzsKFJ7/Clip-Down-com-628224665-18161447524415690-5584247574636630603-n.jpg"] },
+            "huynhhuong": { ten: "Huỳnh Hương", wish: "", anhs: ["https://i.postimg.cc/05hhbFLY/f7c76666-a07c-4628-8e82-dfc3a26dea2f.jpg", "", ""] },
+            "dieuhuyen": { ten: "Diệu Huyền", wish: "", anhs: ["https://i.postimg.cc/7Ymm1DSb/489426143-1658381918888035-8231806056929009121-n.jpg", "https://i.postimg.cc/MpL54DPq/602330494-1881679763224915-6454439552106223098-n.jpg", "https://i.postimg.cc/8cTmWn5d/628160228-1919463409446550-660160964331183792-n.jpg"] },
+            "songkhue": { ten: "Song Khuê", wish: "", anhs: ["https://i.postimg.cc/zXtFb71n/482245110-1819637525537225-4893692940865654898-n.jpg", "https://i.postimg.cc/JzS3Khn2/485610349-1821163392051305-6822434416951356961-n.jpg", "https://i.postimg.cc/XqN9XGHG/Clip-Down-com-489583057-18072854014881991-7476260617093228985-n.jpg"] },
+            "thuyngan": { ten: "Thuỳ Ngân", wish: "", anhs: ["https://i.postimg.cc/jSMWhH6v/z7604231920851-8458e63d186b138a1e2cbee210c8ca70.jpg", "https://i.postimg.cc/sxC12wy1/z7604231926774-517d048fd7e9dcc28438192f3fe95aa9.jpg", ""] },
+            "thungan": { ten: "Thu Ngân", wish: "", anhs: ["https://i.postimg.cc/13VwgZHW/480250768-1357944585366621-6739543617621462151-n.jpg", "https://i.postimg.cc/XvMFdD1F/624679256-4107216752897505-5545522288400458557-n.jpg", "https://i.postimg.cc/RFdHrCSC/627140447-1630399251454485-2558455076160117604-n.jpg"] },
+            "kieuoanh": { ten: "Kiều Oanh", wish: "", anhs: ["https://i.postimg.cc/FKKStWs3/z7604202555089-22f2e500be526e2677bc5ee77f2813c7.jpg", "https://i.postimg.cc/MH1M0gt5/z7604202557820-d0b09b2407a4d9ddbd1a87123d5967fe.jpg", ""] },
+            "thucquyen": { ten: "Thục Quyên", wish: "", anhs: ["https://i.postimg.cc/PrP8ckB1/480172429-1663303490922521-220213420505533284-n.jpg", "https://i.postimg.cc/cL3txB1H/480597918-1666728690580001-3133247562035759578-n.jpg", "https://i.postimg.cc/bJyZRXxy/486832758-1700551363864400-1442648387419309716-n.jpg"] },
+            "tbaotran": { ten: "Bảo Trân", wish: "", anhs: ["https://i.postimg.cc/9FjJ3h6n/24b797ea-9032-4185-bc05-1f6e04fa2d8b.jpg", "", ""] },
+            "kieutrinh": { ten: "Kiều Trinh", wish: "", anhs: ["https://i.postimg.cc/Wpfd0HhR/487289709-1933500324144884-3491949853541560814-n.jpg", "https://i.postimg.cc/tCZYkNxB/632772015-2202201723941408-4182955774953534140-n.jpg", "https://i.postimg.cc/rw5zXygz/645404025-2214677309360516-2824302769170285523-n.jpg"] },
+            "thutruc": { ten: "Thu Trúc", wish: "", anhs: ["https://i.postimg.cc/cHLJnRWv/472925749-122180925506046665-2589000831420042888-n.jpg", "https://i.postimg.cc/qvcBDbMV/474812678-122182985684046665-5708162510459475499-n.jpg", "https://i.postimg.cc/GpqLd4yX/484831922-122189248082046665-1910527453796561571-n.jpg"] },
+            "khavi": { ten: "Khả Vy", wish: "", anhs: ["https://i.postimg.cc/50gNx1PZ/Clip-Down-com-641371020-18399274834176700-4894371207517704645-n.jpg", "https://i.postimg.cc/nrMZpm92/Clip-Down-com-622366440-18001991114850881-5334506188578300596-n.jpg", ""] },
+            "dongvi": { ten: "Đông Vy", wish: "", anhs: ["https://i.postimg.cc/C12wn9JG/dongvy1.jpg", "https://i.postimg.cc/8kqrqYDm/dongvy2.jpg", ""] },
+            "hoangyen": { ten: "Hoàng Yến", wish: "", anhs: ["https://i.postimg.cc/qqDYLZRs/z7604269341521-1eddf51d14bca1e2e4e6313ec1d48a72.jpg", "", ""] },
+        };
 
         const pics = [];
         let player = { x: 90, y: 125, h: 70, w: 55, currentPic: 0, facingLeft: false };
@@ -295,12 +316,41 @@
             document.getElementById('progressCurrent').style.width = percent + '%';
         });
 
+        // --- HÀM XỬ LÝ DASHBOARD CÁ NHÂN HÓA ---
         function goToDashboard() {
             document.getElementById('congrat-screen').classList.add('hidden');
             document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('mini-player').style.display = 'flex';
-            document.getElementById('outName').innerText = `Thân gửi ${userName},`;
-            typeWriter("Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️", "outWish", 60);
+
+            // Lấy ID từ URL (?n=linhanh)
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('n')?.toLowerCase();
+
+            // Mặc định ban đầu
+            let finalName = userName;
+            let finalWish = "Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️";
+            let finalAnhs = ["anh1.jpg", "anh2.jpg", "anh3.jpg", "anh4.jpg"];
+
+            // Nếu ID khớp trong database, ghi đè dữ liệu
+            if (id && personalData[id]) {
+                finalName = personalData[id].ten;
+                finalWish = personalData[id].wish;
+                finalAnhs = personalData[id].anhs;
+            }
+
+            document.getElementById('outName').innerText = `Thân gửi ${finalName},`;
+            typeWriter(finalWish, "outWish", 60);
+            
+            // Nạp ảnh vào slideshow
+            const slideContainer = document.getElementById('slideshow-container');
+            slideContainer.innerHTML = "";
+            finalAnhs.forEach((src, index) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'slideshow-img' + (index === 0 ? ' active' : '');
+                slideContainer.appendChild(img);
+            });
+
             generateCalendar();
             startSlideshow();
         }
@@ -324,8 +374,10 @@
 
         function startSlideshow() {
             const slides = document.querySelectorAll('.slideshow-img');
-            if(slides.length === 0) return;
-            setInterval(() => { 
+            if(slides.length <= 1) return;
+            // Xóa interval cũ nếu có
+            if(window.slidesInterval) clearInterval(window.slidesInterval);
+            window.slidesInterval = setInterval(() => { 
                 slides[currentSlide].classList.remove('active'); 
                 currentSlide = (currentSlide + 1) % slides.length; 
                 slides[currentSlide].classList.add('active'); 
