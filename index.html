@@ -218,11 +218,27 @@
         };
         // Hàm tải trước ảnh
         function preloadImages(data) {
+            // 1. Danh sách các ảnh hệ thống cần ưu tiên tải trước
+            const systemAssets = [
+                defaultImg, 
+                'pixel_player.png', 
+                'paper.png',
+                'pic1.png', 'pic2.png', 'pic3.png', 'pic4.png' // Ảnh nhân vật game
+            ];
+
+            systemAssets.forEach(url => {
+                const img = new Image();
+                img.src = url;
+            });
+
+            // 2. Tiếp tục preload ảnh của người dùng trong personalData
             Object.values(data).forEach(user => {
-                if (user.anhs && user.anhs.length > 0) {
+                if (user.anhs) {
                     user.anhs.forEach(url => {
-                        const img = new Image();
-                        img.src = url; // Trình duyệt sẽ tự tải về cache
+                        if(url && url.trim() !== "") {
+                            const img = new Image();
+                            img.src = url;
+                        }
                     });
                 }
             });
@@ -317,8 +333,8 @@
         function update() {
             if(!gameActive) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(moveL && player.x > 0) { player.x -= 4.5; player.facingLeft = true; }
-            if(moveR && player.x < canvas.width - player.w) { player.x += 4.5; player.facingLeft = false; }
+            if(moveL && player.x > 0) { player.x -= 3.5; player.facingLeft = true; }
+            if(moveR && player.x < canvas.width - player.w) { player.x += 3.5; player.facingLeft = false; }
             player.currentPic = score < 2 ? 0 : score < 4 ? 1 : score < 6 ? 2 : 3;
             const img = pics[player.currentPic];
             if(img && img.complete) {
@@ -327,7 +343,7 @@
                 else { ctx.drawImage(img, player.x, player.y, player.w, player.h); }
                 ctx.restore();
             }
-            if(Math.random() < 0.02) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'pink', speed: 2.3 });
+            if(Math.random() < 0.02) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'pink', speed: 2.0 });
             if(Math.random() < 0.01) hearts.push({ x: Math.random()*230, y: -20, s: 15, type: 'black', speed: 1.5 });
             hearts.forEach((h, i) => {
                 h.y += h.speed;
