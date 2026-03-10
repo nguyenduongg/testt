@@ -189,7 +189,7 @@
     </div>
 
     <script>
-        
+        const defaultImg = "https://i.postimg.cc/cJRLJxVM/anh-default.png";
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const audio = document.getElementById('bgMusic');
@@ -405,28 +405,36 @@
 
         function setupSlideshow(images) {
             const container = document.getElementById('slideshow-container');
-            container.innerHTML = ""; 
+            container.innerHTML = ""; // Xóa sạch các ảnh cũ để tránh chồng chéo
             currentSlide = 0; 
 
-            // Lọc bỏ các phần tử trống hoặc không phải string
-            const valid = images.filter(u => u && typeof u === 'string' && u.trim() !== "");
+            // BƯỚC 1: Lọc cực kỳ nghiêm ngặt để lấy link ảnh hợp lệ
+            let valid = images.filter(url => {
+                return url && typeof url === 'string' && url.trim().length > 10; 
+                // Chỉ lấy những chuỗi dài hơn 10 ký tự (tránh các chuỗi "" hoặc " ")
+            });
             
-            if(valid.length === 0) {
-                // Nếu không có ảnh nào hợp lệ, hiện một ảnh mặc định hoặc thông báo
-                container.innerHTML = "<div style='color:white; text-align:center; padding-top:20%;'>Hẹn gặp lại những kỷ niệm sau nhé! ❤️</div>";
-                return;
+            // BƯỚC 2: Nếu không có ảnh nào hợp lệ thì dùng ảnh mặc định
+            if (valid.length === 0) {
+                valid = [defaultImg]; 
             }
 
-            valid.forEach((u, i) => {
-                const img = new Image();
-                // Thêm ?v= số ngẫu nhiên vào sau link để xóa cache
-                const cacheBuster = "?v=" + new Date().getTime();
-                img.src = u + (u.includes('?') ? '&' : '?') + "v=" + new Date().getTime();
-                
+            // BƯỚC 3: Tạo thẻ img
+            valid.forEach((url, i) => {
+                const img = document.createElement('img');
+                // Thêm cache-breaker để đảm bảo điện thoại không load ảnh cũ bị lỗi
+                img.src = url + (url.includes('?') ? '&' : '?') + "v=" + new Date().getTime();
                 img.className = 'slideshow-img' + (i === 0 ? ' active' : '');
+                
+                // Xử lý nếu link ảnh đó bị hỏng (404) thì chuyển sang ảnh mặc định
+                img.onerror = function() {
+                    this.src = defaultImg;
+                };
+
                 container.appendChild(img);
             });
 
+            // BƯỚC 4: Quản lý vòng lặp
             if (window.slidesInterval) clearInterval(window.slidesInterval);
 
             if (valid.length > 1) {
