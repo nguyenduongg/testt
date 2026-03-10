@@ -156,7 +156,11 @@
             <button class="btn-move" style="width:80px; height:80px; border-radius:50%; background:#333; color:white; border:none;" onmousedown="move(true,'R')" onmouseup="move(false,'R')" ontouchstart="move(true,'R',event)" ontouchend="move(false,'R',event)">▶</button>
         </div>
     </div>
-
+        <div id="end-game-screen" class="hidden" style="position:fixed; inset:0; background:#333; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:400; color:white; font-family:'Press Start 2P';">
+        <h2 style="font-size: 20px; color: #ff85a2;">MISSION COMPLETE</h2>
+        <p style="font-family:'VT323'; font-size: 24px; margin: 20px 0;">Bạn đã thu thập đủ 8 trái tim!</p>
+        <button style="background:#ff4d6d; color:white; padding:12px 25px; border:none; border-radius:10px; cursor:pointer; font-family:'VT323'; font-size:20px;" onclick="showFinalCongrat()">TIẾP TỤC >>></button>
+    </div>
     <div id="congrat-screen" class="hidden" style="position:fixed; inset:0; background:var(--pink-bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:500;">
         <h1 style="font-family:'VT323'; font-size:3.5rem; color:var(--accent);">CONGRATULATIONS!</h1>
         <button style="background:var(--accent); color:white; padding:15px 30px; border-radius:50px; border:none; cursor:pointer; font-weight:bold;" onclick="goToDashboard()">MỞ QUÀ NGAY 🎁</button>
@@ -331,8 +335,13 @@
                 if(h.y > player.y && h.y < player.y + 40 && h.x > player.x - 5 && h.x < player.x + player.w + 5) {
                     if(h.type === 'pink') { score++; document.getElementById('score').innerText = score; }
                     else { lives--; document.getElementById('lives').innerText = "❤️".repeat(lives); if(lives <= 0){ gameActive = false; document.getElementById('game-over-overlay').style.display = 'flex'; }}
-                    hearts.splice(i, 1);
-                    if(score >= 8) { gameActive = false; document.getElementById('congrat-screen').classList.remove('hidden'); document.getElementById('game-box').style.display='none'; }
+                    hearts.splice(i, 1);if(score >= 8) { 
+    gameActive = false; 
+    document.getElementById('game-box').style.display = 'none'; 
+    
+    // CHỈ hiện màn hình Mission Complete, KHÔNG hiện congrat-screen ở đây
+    document.getElementById('end-game-screen').classList.remove('hidden'); 
+}
                 }
                 if(h.y > 200) hearts.splice(i, 1);
             });
@@ -430,6 +439,13 @@
                     }
                 }, 3000); 
             }
+        }
+        function showFinalCongrat() {
+            // Ẩn màn hình kết thúc
+            document.getElementById('end-game-screen').classList.add('hidden');
+            
+            // Hiện màn hình Congrat (nơi có nút Mở quà)
+            document.getElementById('congrat-screen').classList.remove('hidden');
         }
     </script>
 </body>
