@@ -44,9 +44,26 @@
 
         /* --- UI DASHBOARD --- */
         .dashboard { display: none; width: 95%; max-width: 600px; flex-direction: column; align-items: center; padding: 10px 0; }
-        .main-card { position: relative; aspect-ratio: 16/9; width: 100%; border-radius: 25px; overflow: hidden; background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-        .slideshow-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 1.5s; }
-        .slideshow-img.active { opacity: 1; }
+        .main-card { position: relative; aspect-ratio: 16/9; width: 100%; border-radius: 25px; overflow: hidden; background: #ff9595; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .slideshow-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0; /* Mặc định ẩn */
+            transition: opacity 1s ease-in-out; /* Hiệu ứng mờ dần trong 1 giây */
+        }
+
+        .slideshow-img.active {
+            opacity: 1; /* Hiện ảnh có class active */
+        }
+
+        .slideshow-img.active {
+            opacity: 1;
+            transform: scale(1); /* Khi hiện lên thì thu về kích thước chuẩn */
+            z-index: 2;
+        }
 
         .bottom-ui {
             display: flex; justify-content: space-between; align-items: flex-end;
@@ -104,6 +121,8 @@
             <div class="music-item" onclick="startIntro('music3.mp3', 'thumb3.jpg')"><img src="thumb3.jpg" class="thumb"> <span>Ôm trọn thương yêu - RUM</span></div>
             <div class="music-item" onclick="startIntro('music4.mp3', 'thumb4.jpg')"><img src="thumb4.jpg" class="thumb"> <span>Giữ anh cho ngày hôm qua - Hoàng Dũng</span></div>
             <div class="music-item" onclick="startIntro('music5.mp3', 'thumb5.jpg')"><img src="thumb5.jpg" class="thumb"> <span>Từng ngày yêu em - buitruonglinh</span></div>
+            <div class="music-item" onclick="startIntro('music6.mp3', 'thumb6.jpg')"><img src="thumb6.jpg" class="thumb"> <span>Love Language - Kim Min Seok (MeloMance)</span>
+</div>
         </div>
     </div>
 
@@ -166,6 +185,7 @@
     </div>
 
     <script>
+        
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const audio = document.getElementById('bgMusic');
@@ -192,6 +212,20 @@
             "dongvi": { ten: "Đông Vy", wish: "", anhs: ["https://i.postimg.cc/C12wn9JG/dongvy1.jpg", "https://i.postimg.cc/8kqrqYDm/dongvy2.jpg", ""] },
             "hoangyen": { ten: "Hoàng Yến", wish: "", anhs: ["https://i.postimg.cc/qqDYLZRs/z7604269341521-1eddf51d14bca1e2e4e6313ec1d48a72.jpg", "", ""] },
         };
+        // Hàm tải trước ảnh
+        function preloadImages(data) {
+            Object.values(data).forEach(user => {
+                if (user.anhs && user.anhs.length > 0) {
+                    user.anhs.forEach(url => {
+                        const img = new Image();
+                        img.src = url; // Trình duyệt sẽ tự tải về cache
+                    });
+                }
+            });
+        }
+
+        // Gọi hàm ngay khi trang web vừa load xong
+        preloadImages(personalData);
 
         const pics = [];
         let player = { x: 90, y: 125, h: 70, w: 55, currentPic: 0, facingLeft: false };
@@ -322,37 +356,25 @@
             document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('mini-player').style.display = 'flex';
 
-            // Lấy ID từ URL (?n=linhanh)
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('n')?.toLowerCase();
 
-            // Mặc định ban đầu
             let finalName = userName;
             let finalWish = "Chúc nàng một ngày 8/3 thật rạng rỡ, xinh đẹp và ngập tràn niềm vui! Hãy luôn là đóa hoa rạng ngời nhất nhé! ❤️";
             let finalAnhs = ["anh1.jpg", "anh2.jpg", "anh3.jpg", "anh4.jpg"];
 
-            // Nếu ID khớp trong database, ghi đè dữ liệu
             if (id && personalData[id]) {
                 finalName = personalData[id].ten;
-                finalWish = personalData[id].wish;
+                finalWish = personalData[id].wish || finalWish; // Dùng wish mặc định nếu data trống
                 finalAnhs = personalData[id].anhs;
             }
 
             document.getElementById('outName').innerText = `Thân gửi ${finalName},`;
             typeWriter(finalWish, "outWish", 60);
-            
-            // Nạp ảnh vào slideshow
-            const slideContainer = document.getElementById('slideshow-container');
-            slideContainer.innerHTML = "";
-            finalAnhs.forEach((src, index) => {
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'slideshow-img' + (index === 0 ? ' active' : '');
-                slideContainer.appendChild(img);
-            });
 
             generateCalendar();
-            startSlideshow();
+            // TRUYỀN MẢNG ẢNH VÀO ĐÂY
+            setupSlideshow(finalAnhs); 
         }
 
         function typeWriter(text, id, speed, cb) {
@@ -372,16 +394,39 @@
             }
         }
 
-        function startSlideshow() {
-            const slides = document.querySelectorAll('.slideshow-img');
-            if(slides.length <= 1) return;
-            // Xóa interval cũ nếu có
-            if(window.slidesInterval) clearInterval(window.slidesInterval);
-            window.slidesInterval = setInterval(() => { 
-                slides[currentSlide].classList.remove('active'); 
-                currentSlide = (currentSlide + 1) % slides.length; 
-                slides[currentSlide].classList.add('active'); 
-            }, 4000);
+        function setupSlideshow(images) {
+            const container = document.getElementById('slideshow-container');
+            container.innerHTML = ""; 
+            currentSlide = 0; 
+
+            // Lọc bỏ các phần tử trống hoặc không phải string
+            const valid = images.filter(u => u && typeof u === 'string' && u.trim() !== "");
+            
+            if(valid.length === 0) {
+                // Nếu không có ảnh nào hợp lệ, hiện một ảnh mặc định hoặc thông báo
+                container.innerHTML = "<div style='color:white; text-align:center; padding-top:20%;'>Hẹn gặp lại những kỷ niệm sau nhé! ❤️</div>";
+                return;
+            }
+
+            valid.forEach((u, i) => {
+                const img = new Image(); // Dùng đối tượng Image để nạp mượt hơn
+                img.src = u;
+                img.className = 'slideshow-img' + (i === 0 ? ' active' : '');
+                container.appendChild(img);
+            });
+
+            if (window.slidesInterval) clearInterval(window.slidesInterval);
+
+            if (valid.length > 1) {
+                window.slidesInterval = setInterval(() => {
+                    const slides = document.querySelectorAll('.slideshow-img');
+                    if (slides.length > 0) {
+                        slides[currentSlide].classList.remove('active');
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        slides[currentSlide].classList.add('active');
+                    }
+                }, 3000); 
+            }
         }
     </script>
 </body>
