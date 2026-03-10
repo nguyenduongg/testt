@@ -409,8 +409,11 @@
             }
 
             valid.forEach((u, i) => {
-                const img = new Image(); // Dùng đối tượng Image để nạp mượt hơn
-                img.src = u;
+                const img = new Image();
+                // Thêm ?v= số ngẫu nhiên vào sau link để xóa cache
+                const cacheBuster = "?v=" + new Date().getTime();
+                img.src = u + (u.includes('?') ? '&' : '?') + "v=" + new Date().getTime();
+                
                 img.className = 'slideshow-img' + (i === 0 ? ' active' : '');
                 container.appendChild(img);
             });
